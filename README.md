@@ -1,5 +1,9 @@
 # MBE-project
+Outline__
 
-asdlaksdalksdasldkj
+Using eventbrite API to grab events near the users geolocation
 
-this is mikes comment 
+Googlemap geolocation
+
+Google map for displaying events
+
