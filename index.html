@@ -14,36 +14,27 @@
    <h1>Find Events Near You</h1>
 
    <form class="searchBar">
-       <input type="text" placeholder="Search..." name="search2">
-       <button type="submit">submit</button>
+       <input type="text" placeholder="Search..." name="search2" id="userInput">
+       <button type="submit" id="submitButton">submit</button>
      </form>
 
      <div class='gridContainer'>
 
-      <div class="eventContainer">This is where the events will be placed.
+      <div class="eventContainer">
         <ul id="eventsList">
-            <li>
-                Event 1
-            </li>
-            <li>
-                Event 2
-            </li>
-            <li>
-                Event 3
-            </li>
-          </ul>
+        </ul>
       </div>
 
       <div class="mapPlacement" id="map"></div>
 
     </div>
 
-     <script type="text/javascript">
+    <script>
 
     var myLat = 0;
     var myLong = 0;
 
-     navigator.geolocation.getCurrentPosition(function(position) {
+         navigator.geolocation.getCurrentPosition(function(position) {
         myLat = position.coords.latitude;
         myLong = position.coords.longitude;
 
@@ -60,42 +51,63 @@
           })
         });
 
+          console.log(myLat, myLong);
       });
 
+      $("#submitButton").on("click", function() {
 
+        var userInput;
 
-      // 9gwVjFVNPFWKtx3D
+    event.preventDefault();
 
-    var queryURL = "https://app.ticketmaster.com/discovery/v2/events.json?keyword=music&postalCode=60640&apikey=7elxdku9GGG5k8j0Xm8KWdANDgecHMV0"
+    userInput = $("#userInput").val().trim();
+
+    console.log(userInput);
+
+    var queryURL = //"https://app.ticketmaster.com/discovery/v2/events.json?keyword=music&postalCode=60640&apikey=7elxdku9GGG5k8j0Xm8KWdANDgecHMV0"
+    //"https://app.ticketmaster.com/discovery/v2/events.json?keyword=music&latlong=" + myLat + myLong + "&apikey=7elxdku9GGG5k8j0Xm8KWdANDgecHMV0";
+    "https://app.ticketmaster.com/discovery/v2/events.json?keyword=music&city=" + userInput.toString() + "&apikey=7elxdku9GGG5k8j0Xm8KWdANDgecHMV0"
 
 
       $.ajax({
+
       url: queryURL,    
+
       method: "GET"
+
     }).then(function(response) {
+
         var results = response._embedded.events;
         console.log(results);
+
         for (var i = 0; i < results.length; i++) {
 
           var eventName = results[i].name;
-          
-          var eventLI = $("<li>" + eventName + "</li>");
-
-          $("#eventsList").append(eventLI);
-
           var eventLocation = results[i]._embedded.venues[0].address.line1;
           var eventCoords = [results[i]._embedded.venues[0].location.longitude, results[i]._embedded.venues[0].location.latitude];
+          var eventDate = results[i].dates.start.localDate;
+          var eventTime = results[i].dates.start.localTime;
+          var eventLink = results[i].url;
+          var linkForUser = $("<a>Click here to buy tickets</a>");
+          linkForUser.attr("href", eventLink);
+
+          var eventLI = $("<li>");
+          eventLI.attr("class", "eventNearMe");
+          eventLI.attr("data-attr", i);
+          eventLI.append(eventName, "<br>", eventLocation, "<br>", eventDate, "<br>", eventTime, "<br>", linkForUser);
+
+          $("#eventsList").append(eventLI);
         }
 
-        console.log(eventCoords);
-
-
+      });
 
 
 
 
 
     });
+
+  //});
         </script>
 
 <!-- <script src='app.js'></script> -->
