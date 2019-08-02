@@ -1,12 +1,13 @@
 var firebaseConfig = {
-    apiKey: "AIzaSyBHDizJfcjb7mmYH__vIWJuo8yJOCdxv1c",
-    authDomain: "classproject-7a85e.firebaseapp.com",
-    databaseURL: "https://classproject-7a85e.firebaseio.com",
-    projectId: "classproject-7a85e",
+    apiKey: "AIzaSyB_bxWCVNUZm5LDTyco5NaqqzqJBxC0VHM",
+    authDomain: "mbe-projec.firebaseapp.com",
+    databaseURL: "https://mbe-projec.firebaseio.com",
+    projectId: "mbe-projec",
     storageBucket: "",
-    messagingSenderId: "475847005166",
-    appId: "1:475847005166:web:72aefa2a4099570b"
-};
+    messagingSenderId: "257536059910",
+    appId: "1:257536059910:web:2757f6b32210a138"
+  };
+
 firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
 
@@ -51,6 +52,7 @@ function initialize_map(lat, long) {
 }
 
 function add_map_point(lat, lng) {
+   
     var vectorLayer = new ol.layer.Vector({
         source: new ol.source.Vector({
             features: [new ol.Feature({
@@ -88,7 +90,7 @@ navigator.geolocation.getCurrentPosition(function(position) {
         userCityInp = $("#userCityInp").val().trim();
         userKeyWord = $("#userKeyWord").val().trim();
 
-        var queryURL = //"https://app.ticketmaster.com/discovery/v2/events.json?keyword=music&postalCode=60640&apikey=7elxdku9GGG5k8j0Xm8KWdANDgecHMV0"
+        var queryURL =
         //"https://app.ticketmaster.com/discovery/v2/events.json?keyword=" + userKeyWord + "&apikey=7elxdku9GGG5k8j0Xm8KWdANDgecHMV0&latlong=" + myLat + myLong + "&radius=10&units=miles";
         "https://app.ticketmaster.com/discovery/v2/events.json?keyword=" + userKeyWord + "&city=" + userCityInp + "&apikey=7elxdku9GGG5k8j0Xm8KWdANDgecHMV0&radius=10&units=miles";
 
@@ -134,12 +136,105 @@ navigator.geolocation.getCurrentPosition(function(position) {
 
     });
 
+
     $(document).on("click", ".eventNearMe", function () {
 
         var newChatRoom = $(this).attr("data-attr");
 
-        console.log($(this).attr("data-attr"));
+        var trimmedChatName = newChatRoom.replace(".", "").trim();
 
-        database.ref("messaging" + newChatRoom).push();
+        var modal = document.getElementById("chatModal");
 
+        var span = document.getElementsByClassName("close")[0];
+
+        var chatBox = document.getElementById("chatContent");
+
+        var userChatInput = document.getElementById("userChatInput");
+
+        var submitChat = document.getElementById("submitChat");
+
+        // When the user clicks the button, open the modal 
+        modal.style.display = "block";
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+        modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+        }
+
+        database.ref("messaging" + trimmedChatName).on("child_added", function(snapshot) {
+
+            var snap = snapshot.val();
+            //var textUser = snap.user;
+            var textVal = snap.text;
+            var textTime = moment(snap.time).format("LT");
+
+            var newMessage = $("<p>");
+
+            newMessage.text(textVal + "@" + textTime);
+
+            $(chatBox).prepend(newMessage);
+        })
+
+        submitChat.onclick = function() {
+            if (userChatInput != "") {
+
+                var banter = userChatInput.value;
+
+                //var username = sessionStorage.getItem("username");
+    
+                var newBanter = {
+                    //user: username,
+                    text: banter,
+                    time: firebase.database.ServerValue.TIMESTAMP
+                };
+    
+                database.ref("messaging" + trimmedChatName).push(newBanter);
+            
+                userChatInput.value = "";
+            }
+        }
     });
+
+    // function openChatRoom(roomToEnter) {
+    
+    //         if ($("#userChatInput").val().trim() !== "") {
+    
+    //             var banter = $("#userChatInput").val().trim();
+    
+    //             var username = sessionStorage.getItem("username");
+    
+    //             var newBanter = {
+    //                 user: username,
+    //                 text: banter,
+    //                 time: firebase.database.ServerValue.TIMESTAMP
+    //             };
+    
+    //             database.ref("messaging" + trimmedChatName).push(newBanter);
+    
+    //             var inputField = document.getElementById("inpForm");
+    //             inputField.reset();
+    //         }
+    
+    
+    //     database.ref("messaging").on("child_added", function(snapshot) {
+            
+    //         var snap = snapshot.val();
+    //         var textUser = snap.user;
+    //         var textVal = snap.text;
+    //         var textTime = moment(snap.time).format("LT");
+    
+    //         var newMessage = $("<p>");
+    
+    //         newMessage.text(textUser + " @ " + textTime + " : " + textVal);
+    
+    //         $(".messages").prepend(newMessage);
+            
+    //     });
+    // }
