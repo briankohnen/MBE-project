@@ -34,17 +34,36 @@
 
     </div>
 
-<!-- The Modal -->
+<!--Modal to pop-up for chat-->
 <div id="chatModal" class="modal">
 
-  <!-- Modal content -->
   <div class="modal-content">
+      <h1 id="modalTitle" class="modalTitle"></h1>
+      <span class="close">&times;</span>
+        <form id="chatForm">
+          <input type="text" id="userChatInput" class="chatInp"></input>
+          <button id="submitChat" class="chatSubmit">chat!</button>
+        </form>
+      <p id="chatContent"></p>
+  </div>
+
+</div>
+
+
+<div id="loginModal" class="modal">
+
+  <div class="modal-content">
+    <h1 class="modal-title">Login or Sign-up!</h1>
     <span class="close">&times;</span>
-    <form id="chatForm">
-      <input type="text" id="userChatInput" class="chatInp"></input>
-      <button id="submitChat" class="chatSubmit">chat!</button>
-    </form>
-    <p id="chatContent"></p>
+      <form id="loginForm">
+        <input type="text" id="userNameInput" placeholder="enter your username"></input>
+        <button id="login">Login!</button>
+      </form>
+      <form id="signupForm">
+        <input type="text" id="newUserInput" placeholder="enter your username">
+        <button id="login">Sign Up!</button>
+      </form>
+      <p id="nameTakenText"></p>
   </div>
 
 </div>

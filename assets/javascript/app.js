@@ -17,6 +17,37 @@ var myLong = 0;
 var map;
 var mapDefaultZoom = 12;
 
+if (sessionStorage.getItem("username") == null) {
+
+    var modal = document.getElementById("loginModal");
+
+    var span = document.getElementsByClassName("close")[0];
+
+    var userNameInput = document.getElementById("userNameInput");
+
+    var login = document.getElementById("login");
+    
+    var newUserInput = document.getElementById("newUserInput");
+
+    modal.style.display = "block";
+
+    span.onclick = function() {
+        modal.style.display ="none"
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+        login.onclick = function() {
+            if (userNameInput != " ") {
+                sessionStorage.setItem("username", userNameInput);
+                database.ref("users").push(userNameInput);
+            }
+        }
+};
 
 function initialize_map(lat, long) {
         map = new ol.Map({
@@ -102,7 +133,6 @@ navigator.geolocation.getCurrentPosition(function(position) {
         method: "GET"
 
         }).then(function(response) {
-            console.log(response);
 
             $("#eventsList").empty();
 
@@ -141,11 +171,20 @@ navigator.geolocation.getCurrentPosition(function(position) {
 
         $("#chatContent").empty();
 
-        var newChatRoom = $(this).attr("data-attr");
+        var grabEventName = $(this).attr("data-attr");
 
-        var trimmedChatName = newChatRoom.replace(".", "");
+        var eventNameArray = grabEventName.split("");
 
-        console.log(trimmedChatName);
+        for (var i = 0; i < eventNameArray.length; i++) {
+            if (eventNameArray[i] == " " || eventNameArray[i] == "$" || eventNameArray[i] == ".") {
+                eventNameArray.splice(i, 1);
+            }
+            var cleanEventName = eventNameArray.join("");
+        }
+
+        console.log(cleanEventName);
+
+        var modalTitle = $(this).attr("data-attr");
 
         var modal = document.getElementById("chatModal");
 
@@ -157,22 +196,21 @@ navigator.geolocation.getCurrentPosition(function(position) {
 
         var submitChat = document.getElementById("submitChat");
 
-        // When the user clicks the button, open the modal 
+        $("#modalTitle").text(modalTitle);
+
         modal.style.display = "block";
 
-        // When the user clicks on <span> (x), close the modal
         span.onclick = function() {
-        modal.style.display = "none";
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-        if (event.target == modal) {
             modal.style.display = "none";
         }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
         }
 
-        database.ref("messaging" + trimmedChatName).on("child_added", function(snapshot) {
+        database.ref("messaging" + cleanEventName).on("child_added", function(snapshot) {
 
             var snap = snapshot.val();
             //var textUser = snap.user;
@@ -181,14 +219,15 @@ navigator.geolocation.getCurrentPosition(function(position) {
 
             var newMessage = $("<p>");
 
-            newMessage.text(textVal + "@" + textTime);
+            newMessage.text(textVal + " @ " + textTime);
 
             $(chatContent).prepend(newMessage);
+
         })
 
         submitChat.onclick = function(event) {
             event.preventDefault();
-            if (userChatInput != "") {
+            if ($(userChatInput).val().trim() != "") {
 
                 var banter = userChatInput.value;
 
@@ -200,9 +239,11 @@ navigator.geolocation.getCurrentPosition(function(position) {
                     time: firebase.database.ServerValue.TIMESTAMP
                 };
     
-                database.ref("messaging" + trimmedChatName).push(newBanter);
+                database.ref("messaging" + cleanEventName).push(newBanter);
             
                 userChatInput.value = "";
             }
         }
     });
+
+
