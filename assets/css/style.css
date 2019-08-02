@@ -49,7 +49,8 @@ h1 {
    margin: auto;
    padding: 20px;
    border: 1px solid #888;
-   width: 80%;
+   width: 50%;
+   max-height: 400px;
    overflow-y: scroll;
  }
  
@@ -66,5 +67,11 @@ h1 {
    color: #000;
    text-decoration: none;
    cursor: pointer;
+ }
+ .chatInp {
+    float: right;
+ }
+ .chatSubmit {
+    float: right;
  }
 

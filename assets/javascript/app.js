@@ -139,15 +139,19 @@ navigator.geolocation.getCurrentPosition(function(position) {
 
     $(document).on("click", ".eventNearMe", function () {
 
+        $("#chatContent").empty();
+
         var newChatRoom = $(this).attr("data-attr");
 
-        var trimmedChatName = newChatRoom.replace(".", "").trim();
+        var trimmedChatName = newChatRoom.replace(".", "");
+
+        console.log(trimmedChatName);
 
         var modal = document.getElementById("chatModal");
 
         var span = document.getElementsByClassName("close")[0];
 
-        var chatBox = document.getElementById("chatContent");
+        var chatContent = document.getElementById("chatContent");
 
         var userChatInput = document.getElementById("userChatInput");
 
@@ -179,10 +183,11 @@ navigator.geolocation.getCurrentPosition(function(position) {
 
             newMessage.text(textVal + "@" + textTime);
 
-            $(chatBox).prepend(newMessage);
+            $(chatContent).prepend(newMessage);
         })
 
-        submitChat.onclick = function() {
+        submitChat.onclick = function(event) {
+            event.preventDefault();
             if (userChatInput != "") {
 
                 var banter = userChatInput.value;
@@ -201,40 +206,3 @@ navigator.geolocation.getCurrentPosition(function(position) {
             }
         }
     });
-
-    // function openChatRoom(roomToEnter) {
-    
-    //         if ($("#userChatInput").val().trim() !== "") {
-    
-    //             var banter = $("#userChatInput").val().trim();
-    
-    //             var username = sessionStorage.getItem("username");
-    
-    //             var newBanter = {
-    //                 user: username,
-    //                 text: banter,
-    //                 time: firebase.database.ServerValue.TIMESTAMP
-    //             };
-    
-    //             database.ref("messaging" + trimmedChatName).push(newBanter);
-    
-    //             var inputField = document.getElementById("inpForm");
-    //             inputField.reset();
-    //         }
-    
-    
-    //     database.ref("messaging").on("child_added", function(snapshot) {
-            
-    //         var snap = snapshot.val();
-    //         var textUser = snap.user;
-    //         var textVal = snap.text;
-    //         var textTime = moment(snap.time).format("LT");
-    
-    //         var newMessage = $("<p>");
-    
-    //         newMessage.text(textUser + " @ " + textTime + " : " + textVal);
-    
-    //         $(".messages").prepend(newMessage);
-            
-    //     });
-    // }
