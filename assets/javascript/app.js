@@ -122,10 +122,12 @@ navigator.geolocation.getCurrentPosition(function(position) {
             var eventLink = results[i].url;
             var linkForUser = $("<a>Click here to buy tickets</a>");
             linkForUser.attr("href", eventLink);
+            var eventImg = results[i].images[2].url;
 
             var eventLI = $("<li>");
             eventLI.attr("class", "eventNearMe");
             eventLI.attr("data-attr", eventName);
+            eventLI.attr("data-img", eventImg);
             eventLI.append(eventName, "<br>", eventLocation, "<br>", eventDate, "<br>", eventTime, "<br>", linkForUser);
 
             $("#eventsList").append(eventLI);
@@ -137,14 +139,13 @@ navigator.geolocation.getCurrentPosition(function(position) {
 
         });
 
-    });
-
-
     $(document).on("click", ".eventNearMe", function () {
 
         $("#chatContent").empty();
 
         var grabEventName = $(this).attr("data-attr");
+
+        var grabEventDisplay = $(this).attr("data-img");
 
         var eventNameArray = grabEventName.split("");
 
@@ -170,6 +171,8 @@ navigator.geolocation.getCurrentPosition(function(position) {
         var submitChat = document.getElementById("submitChat");
 
         $("#modalTitle").text(modalTitle);
+
+        $("#eventDisplay").attr("src", grabEventDisplay);
 
         modal.style.display = "block";
 
@@ -218,6 +221,8 @@ navigator.geolocation.getCurrentPosition(function(position) {
             }
         }
     });
+
+});
 
 
     if (sessionStorage.getItem("username") == null) {
