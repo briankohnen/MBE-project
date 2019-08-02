@@ -17,37 +17,6 @@ var myLong = 0;
 var map;
 var mapDefaultZoom = 12;
 
-if (sessionStorage.getItem("username") == null) {
-
-    var modal = document.getElementById("loginModal");
-
-    var span = document.getElementsByClassName("close")[0];
-
-    var userNameInput = document.getElementById("userNameInput");
-
-    var login = document.getElementById("login");
-    
-    var newUserInput = document.getElementById("newUserInput");
-
-    modal.style.display = "block";
-
-    span.onclick = function() {
-        modal.style.display ="none"
-    }
-
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
-
-        login.onclick = function() {
-            if (userNameInput != " ") {
-                sessionStorage.setItem("username", userNameInput);
-                database.ref("users").push(userNameInput);
-            }
-        }
-};
 
 function initialize_map(lat, long) {
         map = new ol.Map({
@@ -108,6 +77,10 @@ navigator.geolocation.getCurrentPosition(function(position) {
     myLong = position.coords.longitude;
 
     initialize_map(myLat, myLong);
+}, function(error) {
+    if (error.code == error.PERMISSION_DENIED) {
+        initialize_map(41.895886, -87.62003)
+    }
 });
 
 
@@ -213,13 +186,13 @@ navigator.geolocation.getCurrentPosition(function(position) {
         database.ref("messaging" + cleanEventName).on("child_added", function(snapshot) {
 
             var snap = snapshot.val();
-            //var textUser = snap.user;
+            var textUser = snap.user;
             var textVal = snap.text;
             var textTime = moment(snap.time).format("LT");
 
             var newMessage = $("<p>");
 
-            newMessage.text(textVal + " @ " + textTime);
+            newMessage.text(textUser + " : " + textVal + " @ " + textTime);
 
             $(chatContent).prepend(newMessage);
 
@@ -231,10 +204,10 @@ navigator.geolocation.getCurrentPosition(function(position) {
 
                 var banter = userChatInput.value;
 
-                //var username = sessionStorage.getItem("username");
+                var username = sessionStorage.getItem("username");
     
                 var newBanter = {
-                    //user: username,
+                    user: username,
                     text: banter,
                     time: firebase.database.ServerValue.TIMESTAMP
                 };
@@ -247,3 +220,55 @@ navigator.geolocation.getCurrentPosition(function(position) {
     });
 
 
+    if (sessionStorage.getItem("username") == null) {
+
+        var modal = document.getElementById("loginModal");
+
+        var span = document.getElementsByClassName("close")[0];
+
+        var userNameInput = document.getElementById("userNameInput");
+
+        var login = document.getElementById("login");
+        
+        //var newUserInput = document.getElementById("newUserInput");
+
+        //var signup = document.getElementById("signup");
+
+        modal.style.display = "block";
+
+        span.onclick = function() {
+            modal.style.display ="none"
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+            login.onclick = function(event) {
+
+                event.preventDefault();
+
+                var newName = userNameInput.value;
+
+                if (newName.trim() != "" && newName.trim().length < 13) {
+                    
+                    var newUser = {
+                        username : newName
+                    };
+
+                    database.ref("users").push(newUser);
+
+                    sessionStorage.setItem("username", newName);
+
+                    modal.style.display = "none";
+
+                } else {
+
+                    $("#nameTakenText").text("Username cannot be blank, and no longer than 12 characters.");
+
+                }
+
+            }
+    };
