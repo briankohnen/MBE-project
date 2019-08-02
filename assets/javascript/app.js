@@ -58,7 +58,7 @@ function initialize_map(lat, long) {
 
 function changeMapView(lat, long) {
     map.getView().setCenter(ol.proj.transform([parseFloat(long), parseFloat(lat)], 'EPSG:4326', 'EPSG:3857'));
-    map.getView().setZoom(15);
+    map.getView().setZoom(16);
     }
 
 
@@ -135,17 +135,22 @@ navigator.geolocation.getCurrentPosition(function(position) {
             var eventDate = results[i].dates.start.localDate;
             var eventTime = results[i].dates.start.localTime;
             var eventLink = results[i].url;
+            var eventImg = results[i].images[2].url;
+
             var linkForUser = $("<a>Click here to buy tickets</a>");
             linkForUser.attr("href", eventLink);
-            var eventImg = results[i].images[2].url;
 
             var eventLI = $("<li>");
             eventLI.attr("class", "eventNearMe");
-            eventLI.attr("data-attr", eventName);
-            eventLI.attr("data-img", eventImg);
             eventLI.attr("data-long", eventCoords[0]);
             eventLI.attr("data-lat", eventCoords[1]);
-            eventLI.append(eventName, "<br>", eventLocation, "<br>", eventDate, "<br>", eventTime, "<br>", linkForUser);
+
+            var eventChatButton = $("<button>See what other users are saying</button>");
+            eventChatButton.attr("class", "openChat");
+            eventChatButton.attr("data-attr", eventName);
+            eventChatButton.attr("data-img", eventImg);
+
+            eventLI.append(eventName, "<br>", eventLocation, "<br>", eventDate, "<br>", eventTime, "<br>", linkForUser , " " , eventChatButton);
 
             $("#eventsList").append(eventLI);
 
@@ -160,18 +165,20 @@ navigator.geolocation.getCurrentPosition(function(position) {
 
 
     $(document).on("click", ".eventNearMe", function () {
+        var grabEventLong = $(this).attr("data-long");
+
+        var grabEventLat = $(this).attr("data-lat");
+
+        changeMapView(grabEventLat, grabEventLong);
+    });
+
+    $(document).on("click", ".openChat", function() {
 
         $("#chatContent").empty();
 
         var grabEventName = $(this).attr("data-attr");
 
         var grabEventDisplay = $(this).attr("data-img");
-
-        var grabEventLong = $(this).attr("data-long");
-
-        var grabEventLat = $(this).attr("data-lat");
-
-        changeMapView(grabEventLat, grabEventLong);
 
         var eventNameArray = grabEventName.split("");
 
