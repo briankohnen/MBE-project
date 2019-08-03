@@ -51,7 +51,22 @@ function initialize_map(lat, long) {
     });
 
     map.addLayer(vectorLayer);
-    console.log(map.getView().getCenter());
+    hoverInteraction = new ol.interaction.Select({
+        condition: ol.events.condition.pointerMove,
+        layers:[vectorLayer]  //Setting layers to be hovered
+    });
+    map.addInteraction(hoverInteraction);
+
+    map.on('singleclick', function(evt) {
+        var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+            //you can add a condition on layer to restrict the listener
+            return feature;
+            });
+        if (feature) {
+            console.log("wow");
+            //here you can add you code to display the coordinates or whatever you want to do
+        }
+    });
 }
 
 
@@ -82,7 +97,26 @@ function add_map_point(lat, lng) {
     });
 
     map.addLayer(vectorLayer);
+
+    hoverInteraction = new ol.interaction.Select({
+        condition: ol.events.condition.pointerMove,
+        layers:[vectorLayer]  //Setting layers to be hovered
+    });
+    map.addInteraction(hoverInteraction);
+
+    map.on('singleclick', function(evt) {
+        var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+            //you can add a condition on layer to restrict the listener
+            return feature;
+            });
+        if (feature) {
+            console.log("wow");
+            //here you can add you code to display the coordinates or whatever you want to do
+        }
+    });
+
 }
+
 
 
 
@@ -111,9 +145,7 @@ navigator.geolocation.getCurrentPosition(function(position) {
         userCityInp = $("#userCityInp").val().trim();
         userKeyWord = $("#userKeyWord").val().trim();
 
-        var queryURL =
-        //"https://app.ticketmaster.com/discovery/v2/events.json?keyword=" + userKeyWord + "&apikey=7elxdku9GGG5k8j0Xm8KWdANDgecHMV0&latlong=" + myLat + myLong + "&radius=10&units=miles";
-        "https://app.ticketmaster.com/discovery/v2/events.json?keyword=" + userKeyWord + "&city=" + userCityInp + "&apikey=7elxdku9GGG5k8j0Xm8KWdANDgecHMV0&radius=10&units=miles";
+        var queryURL = "https://app.ticketmaster.com/discovery/v2/events.json?keyword=" + userKeyWord + "&city=" + userCityInp + "&apikey=7elxdku9GGG5k8j0Xm8KWdANDgecHMV0&radius=10&units=miles";
 
 
         $.ajax({
@@ -173,6 +205,8 @@ navigator.geolocation.getCurrentPosition(function(position) {
 
         changeMapView(grabEventLat, grabEventLong);
     });
+
+
 
     $(document).on("click", ".openChat", function() {
 
