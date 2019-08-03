@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head Access-Control-Allow-Origin: *>
    <meta charset='utf-8'>
    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
    <title>Page Title</title>
@@ -8,13 +8,18 @@
    <link rel='stylesheet' type='text/css' media='screen' href='assets/css/style.css'>
    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/6.3.4/firebase-app.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/6.3.4/firebase-database.js"></script>
 </head>
 <body>
 
    <h1>Find Events Near You</h1>
 
    <form class="searchBar">
-       <input type="text" placeholder="Search..." name="search2" id="userInput">
+       <input type="text" placeholder="Search a city..." name="search2" id="userCityInp">
+       <br>
+       <input type="text" placeholder="Music? Sports? Venues?" id="userKeyWord">
+       <br>
        <button type="submit" id="submitButton">submit</button>
      </form>
 
@@ -29,88 +34,43 @@
 
     </div>
 
-    <script>
+<!--Modal to pop-up for chat-->
+<div id="chatModal" class="modal">
 
-    var myLat = 0;
-    var myLong = 0;
+  <div class="modal-content">
+      <h1 id="modalTitle" class="modalTitle"></h1>
+      <span class="close">&times;</span>
+        <form id="chatForm">
+          <input type="text" id="userChatInput" class="chatInp"></input>
+          <button id="submitChat" class="chatSubmit">chat!</button>
+        </form>
+        <img id="eventDisplay" src=""></img>
+      <p id="chatContent"></p>
+  </div>
 
-         navigator.geolocation.getCurrentPosition(function(position) {
-        myLat = position.coords.latitude;
-        myLong = position.coords.longitude;
-
-        var map = new ol.Map({
-          target: 'map',
-          layers: [
-            new ol.layer.Tile({
-              source: new ol.source.OSM()
-            })
-          ],
-          view: new ol.View({
-            center: ol.proj.fromLonLat([myLong, myLat]),
-            zoom: 18
-          })
-        });
-
-          console.log(myLat, myLong);
-      });
-
-      $("#submitButton").on("click", function() {
-
-        var userInput;
-
-    event.preventDefault();
-
-    userInput = $("#userInput").val().trim();
-
-    console.log(userInput);
-
-    var queryURL = //"https://app.ticketmaster.com/discovery/v2/events.json?keyword=music&postalCode=60640&apikey=7elxdku9GGG5k8j0Xm8KWdANDgecHMV0"
-    //"https://app.ticketmaster.com/discovery/v2/events.json?keyword=music&latlong=" + myLat + myLong + "&apikey=7elxdku9GGG5k8j0Xm8KWdANDgecHMV0";
-    "https://app.ticketmaster.com/discovery/v2/events.json?keyword=music&city=" + userInput.toString() + "&apikey=7elxdku9GGG5k8j0Xm8KWdANDgecHMV0"
+</div>
 
 
-      $.ajax({
+<div id="loginModal" class="modal">
 
-      url: queryURL,    
+  <div class="modal-content">
+    <h1 class="modal-title">Login or Sign-up!</h1>
+    <span class="close">&times;</span>
+      <form id="loginForm">
+        <input type="text" id="userNameInput" placeholder="enter your username"></input>
+        <button id="login">Login!</button>
+      </form>
+      <!-- <form id="signupForm">
+        <input type="text" id="newUserInput" placeholder="enter your username">
+        <button id="signup">Sign Up!</button>
+      </form> -->
+      <p id="nameTakenText"></p>
+  </div>
 
-      method: "GET"
+</div>
 
-    }).then(function(response) {
-
-        var results = response._embedded.events;
-        console.log(results);
-
-        for (var i = 0; i < results.length; i++) {
-
-          var eventName = results[i].name;
-          var eventLocation = results[i]._embedded.venues[0].address.line1;
-          var eventCoords = [results[i]._embedded.venues[0].location.longitude, results[i]._embedded.venues[0].location.latitude];
-          var eventDate = results[i].dates.start.localDate;
-          var eventTime = results[i].dates.start.localTime;
-          var eventLink = results[i].url;
-          var linkForUser = $("<a>Click here to buy tickets</a>");
-          linkForUser.attr("href", eventLink);
-
-          var eventLI = $("<li>");
-          eventLI.attr("class", "eventNearMe");
-          eventLI.attr("data-attr", i);
-          eventLI.append(eventName, "<br>", eventLocation, "<br>", eventDate, "<br>", eventTime, "<br>", linkForUser);
-
-          $("#eventsList").append(eventLI);
-        }
-
-      });
-
-
-
-
-
-    });
-
-  //});
-        </script>
-
-<!-- <script src='app.js'></script> -->
+<script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
+<script src='assets/javascript/app.js'></script>
 
 </body>
 </html>
