@@ -86,6 +86,8 @@ function add_map_point(lat, lng) {
 
 
 
+
+
 navigator.geolocation.getCurrentPosition(function(position) {
     myLat = position.coords.latitude;
     myLong = position.coords.longitude;
