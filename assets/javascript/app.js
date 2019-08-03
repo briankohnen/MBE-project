@@ -11,11 +11,14 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
 
+
 var myLat = 0;
 var myLong = 0;
 
+
 var map;
 var mapDefaultZoom = 12;
+
 
 
 function initialize_map(lat, long) {
@@ -48,8 +51,17 @@ function initialize_map(lat, long) {
     });
 
     map.addLayer(vectorLayer);
-    console.log(myLat, myLong);
+    console.log(map.getView().getCenter());
 }
+
+
+
+function changeMapView(lat, long) {
+    map.getView().setCenter(ol.proj.transform([parseFloat(long), parseFloat(lat)], 'EPSG:4326', 'EPSG:3857'));
+    map.getView().setZoom(16);
+    }
+
+
 
 function add_map_point(lat, lng) {
    
@@ -72,6 +84,10 @@ function add_map_point(lat, lng) {
     map.addLayer(vectorLayer);
 }
 
+
+
+
+
 navigator.geolocation.getCurrentPosition(function(position) {
     myLat = position.coords.latitude;
     myLong = position.coords.longitude;
@@ -82,6 +98,7 @@ navigator.geolocation.getCurrentPosition(function(position) {
         initialize_map(41.895886, -87.62003)
     }
 });
+
 
 
     $("#submitButton").on("click", function() {
@@ -120,31 +137,50 @@ navigator.geolocation.getCurrentPosition(function(position) {
             var eventDate = results[i].dates.start.localDate;
             var eventTime = results[i].dates.start.localTime;
             var eventLink = results[i].url;
+            var eventImg = results[i].images[2].url;
+
             var linkForUser = $("<a>Click here to buy tickets</a>");
             linkForUser.attr("href", eventLink);
 
             var eventLI = $("<li>");
             eventLI.attr("class", "eventNearMe");
-            eventLI.attr("data-attr", eventName);
-            eventLI.append(eventName, "<br>", eventLocation, "<br>", eventDate, "<br>", eventTime, "<br>", linkForUser);
+            eventLI.attr("data-long", eventCoords[0]);
+            eventLI.attr("data-lat", eventCoords[1]);
+
+            var eventChatButton = $("<button>See what other users are saying</button>");
+            eventChatButton.attr("class", "openChat");
+            eventChatButton.attr("data-attr", eventName);
+            eventChatButton.attr("data-img", eventImg);
+
+            eventLI.append(eventName, "<br>", eventLocation, "<br>", eventDate, "<br>", eventTime, "<br>", linkForUser , " " , eventChatButton);
 
             $("#eventsList").append(eventLI);
 
             add_map_point(eventCoords[1], eventCoords[0]);
 
-            }
-            
+            }     
 
         });
 
     });
 
 
+
     $(document).on("click", ".eventNearMe", function () {
+        var grabEventLong = $(this).attr("data-long");
+
+        var grabEventLat = $(this).attr("data-lat");
+
+        changeMapView(grabEventLat, grabEventLong);
+    });
+
+    $(document).on("click", ".openChat", function() {
 
         $("#chatContent").empty();
 
         var grabEventName = $(this).attr("data-attr");
+
+        var grabEventDisplay = $(this).attr("data-img");
 
         var eventNameArray = grabEventName.split("");
 
@@ -155,7 +191,7 @@ navigator.geolocation.getCurrentPosition(function(position) {
             var cleanEventName = eventNameArray.join("");
         }
 
-        console.log(cleanEventName);
+        //console.log(cleanEventName);
 
         var modalTitle = $(this).attr("data-attr");
 
@@ -170,6 +206,8 @@ navigator.geolocation.getCurrentPosition(function(position) {
         var submitChat = document.getElementById("submitChat");
 
         $("#modalTitle").text(modalTitle);
+
+        $("#eventDisplay").attr("src", grabEventDisplay);
 
         modal.style.display = "block";
 
@@ -220,6 +258,7 @@ navigator.geolocation.getCurrentPosition(function(position) {
     });
 
 
+    
     if (sessionStorage.getItem("username") == null) {
 
         var modal = document.getElementById("loginModal");
